@@ -35,28 +35,9 @@ export function NewList() {
 
   useEffect(() => {
     getCollections();
-    setFirstCollection();
   }, []);
   
 
-  const setFirstCollection = async() => {
-    setIsLoading(true)
-    let firstCollection = ""
-    const response = await fetch(`/api/collection/first`);
-    if (response.ok) {
-      const responseData = await response.json();
-      firstCollection  = responseData.data.body.data.collections.edges[0].node.id;
-      console.log(firstCollection)
-
-
-
-    }else {
-      firstCollection ="Aucune collection existante"
-      console.log(firstCollection);
-      setIsLoading(false);
-    }
-    setCollection(firstCollection)
-  }
 
   const getCollections = async() => {
     setIsLoading(true)
@@ -64,10 +45,14 @@ export function NewList() {
     const tab= [];
     if (response.ok) {
       const responseData = await response.json();
-      
+      let isFirstTime = true;
       // const edges = responseData.data.body.data.products.edges;
       let length = responseData.data.body.data.collections.edges.length;
       for(let i = 0;i < length;i++) { 
+        if (isFirstTime){
+          isFirstTime = false;
+          setCollection(responseData.data.body.data.collections.edges[i].node.id);
+        }
         const label = responseData.data.body.data.collections.edges[i].node.title;
         const value = responseData.data.body.data.collections.edges[i].node.id;
         tab.push({ label: label.toString(), value: value.toString() });
